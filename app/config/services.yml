@@ -29,6 +29,16 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
+    AppBundle\EventListener\BkmExpressNonceFinishListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.terminate }
+
+    AppBundle\Payment\BkmExpress:
+        arguments:
+            - '%bkm_express_merchant_id%'
+            - '%bkm_express_environment%'
+            - '%bkm_express_certificates%'
+
     # add more services, or override services that need manual wiring
     # AppBundle\Service\ExampleService:
     #     arguments:
