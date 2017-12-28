@@ -87,7 +87,7 @@ class BkmExpress
         $loginUrl = $this->getApiEndpoint('merchant/login');
         $merchantId = $this->getMerchantId();
         
-        $this->logger->info('login url:', $loginUrl);
+        $this->logger->info('login url: '. $loginUrl);
         
         $payload = [
             'id' => $merchantId, 
@@ -117,7 +117,7 @@ class BkmExpress
         
         $ticketUrl = $this->getApiEndpoint('merchant/' . $login->data->path . '/ticket?type=payment');
 
-        $this->logger->info('ticket url:', $ticketUrl);
+        $this->logger->info('ticket url:' . $ticketUrl);
         
         $headers = [
             'Content-Type' => 'application/json',
@@ -142,7 +142,7 @@ class BkmExpress
         $nonceUrl = $this->getApiEndpoint('merchant/' . $login->data->path . 
                 '/ticket/' . $data->path . '/operate?name=commit');
         
-        $this->logger->info('send nonce url:', $nonceUrl);
+        $this->logger->info('send nonce url:'. $nonceUrl);
         
         $payload = [
             'result' => $result,
