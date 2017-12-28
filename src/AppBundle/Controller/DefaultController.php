@@ -50,7 +50,7 @@ class DefaultController extends Controller
         return $this->render('default/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')) . DIRECTORY_SEPARATOR,
             'ticket' => $ticket->data,
-            'endpoint' => $bkmExpress->getJsUrl()
+            'endpoint' => $this->bkmExpress->getJsUrl()
         ]);
     }
     
