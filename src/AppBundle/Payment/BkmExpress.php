@@ -3,6 +3,8 @@
 
 namespace AppBundle\Payment;
 
+use Psr\Log\LoggerInterface;
+
 class BkmExpress
 {
     protected static $environments = [
@@ -32,12 +34,14 @@ class BkmExpress
     protected $environment;
     protected $certificates;
     protected $encryption;
+    protected $logger;
 
-    public function __construct(string $merchantId, string $environment, array $certificates)
+    public function __construct(string $merchantId, string $environment, array $certificates, LoggerInterface $logger)
     {
         $this->merchantId = $merchantId;
         $this->environment = $environment;
         $this->certificates = $certificates;
+        $this->logger = $logger;
         
         $this->encryption = new BkmExpress\Encryption($certificates['remote']['public'], 
                 $certificates['local']['private']);
@@ -78,41 +82,67 @@ class BkmExpress
 
     public function login()
     {
+        $this->logger->info('login operation started');
+        
         $loginUrl = $this->getApiEndpoint('merchant/login');
         $merchantId = $this->getMerchantId();
+        
+        $this->logger->info('login url:', $loginUrl);
         
         $payload = [
             'id' => $merchantId, 
             'signature' => $this->getEncryption()->signData($merchantId)
         ];
         
+        $this->logger->info('login payload:', $payload);
+        
         $headers = [
             'Content-Type' => 'application/json'
         ];
         
-        return $this->postData($loginUrl, $payload, $headers);
+        $this->logger->info('login headers:', $headers);
+        
+        $response = $this->postData($loginUrl, $payload, $headers);
+
+        $this->logger->info('login operation ended');
+        
+        return $response;
     }
     
     public function getTicket($payload)
     {
         $login = $this->login();
         
+        $this->logger->info('ticket operation started');
+        
         $ticketUrl = $this->getApiEndpoint('merchant/' . $login->data->path . '/ticket?type=payment');
 
+        $this->logger->info('ticket url:', $ticketUrl);
+        
         $headers = [
             'Content-Type' => 'application/json',
             'Bex-Connection' => $login->data->token
         ];
         
-        return $this->postData($ticketUrl, $payload, $headers);
+        $this->logger->info('ticket headers:', $headers);
+        
+        $response = $this->postData($ticketUrl, $payload, $headers);
+        
+        $this->logger->info('ticket operation ended');
+        
+        return $response;
     }
     
     public function sendNonce($data, $result, $message = null)
     {
         $login = $this->login();
         
+        $this->logger->info('send nonce operation started');
+        
         $nonceUrl = $this->getApiEndpoint('merchant/' . $login->data->path . 
                 '/ticket/' . $data->path . '/operate?name=commit');
+        
+        $this->logger->info('send nonce url:', $nonceUrl);
         
         $payload = [
             'result' => $result,
@@ -121,13 +151,21 @@ class BkmExpress
             'message' => $message
         ];
         
+        $this->logger->info('send nonce payload:', $payload);
+        
         $headers = [
             'Content-Type' => 'application/json',
             'Bex-Connection' => $login->data->token,
             'Bex-Nonce' => $data->token
         ];
+        
+        $this->logger->info('send nonce headers:', $headers);
 
-        return $this->postData($nonceUrl, $payload, $headers);
+        $response = $this->postData($nonceUrl, $payload, $headers);
+        
+        $this->logger->info('send nonce operation ended');
+        
+        return $response;
     }
     
     protected function postData($url, $data, $headers)

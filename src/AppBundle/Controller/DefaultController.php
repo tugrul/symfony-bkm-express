@@ -9,16 +9,27 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Payment\BkmExpress;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
+use Psr\Log\LoggerInterface;
 
 class DefaultController extends Controller
 {
    
+    protected $bkmExpress;
+    protected $logger;
+    
+    public function __construct(BkmExpress $bkmExpress, LoggerInterface $logger)
+    {
+        $this->bkmExpress = $bkmExpress;
+        $this->logger = $logger;
+    }
+    
     /**
      * @Route("/", name="homepage")
      */
-    public function indexAction(Request $request, BkmExpress $bkmExpress)
+    public function indexAction(Request $request)
     {
+        $this->logger->info('index action');
+        
         
         $payload = [
             'amount' => '1',
@@ -32,7 +43,9 @@ class DefaultController extends Controller
             //'agreementUrl' => ''
         ];
 
-        $ticket = $bkmExpress->getTicket($payload);
+        $ticket = $this->bkmExpress->getTicket($payload);
+        
+        $this->logger->info('index action return');
         
         return $this->render('default/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')) . DIRECTORY_SEPARATOR,
@@ -46,11 +59,16 @@ class DefaultController extends Controller
      * @param Request $request
      * @Route("/nonce", name="bkm-nonce")
      */
-    public function nonceAction(Request $request, BkmExpress $bkmExpress)
+    public function nonceAction(Request $request)
     {
+        $this->logger->info('nonce action');
+        
         $payload = json_decode($request->getContent());
         
-        if (!$bkmExpress->getEncryption()->verifyData($payload->id, $payload->signature)) {
+        if (!$this->bkmExpress->getEncryption()->verifyData($payload->id, $payload->signature)) {
+            
+            $this->logger->info('signature verification failed');
+            
             $response = new JsonResponse([
                 'data' => null,
                 'status' => 'fail', 
@@ -69,6 +87,8 @@ class DefaultController extends Controller
         
         $response->setStatusCode(202, 'Accepted');
         
+        $this->logger->info('nonce action return');
+        
         return $response;
     }
 
@@ -77,11 +97,18 @@ class DefaultController extends Controller
      * @param Request $request
      * @Route("/installment", name="bkm-installment")
      */
-    public function installmentAction(Request $request, BkmExpress $bkmExpress)
+    public function installmentAction(Request $request)
     {
+        $this->logger->info('installment action');
+
         $payload = json_decode($request->getContent());
 
-        if (!$bkmExpress->getEncryption()->verifyData($payload->ticketId, $payload->signature)) {
+        $this->logger->info('installment request body of bkm:', json_decode(json_encode($payload), true));
+        
+        if (!$this->bkmExpress->getEncryption()->verifyData($payload->ticketId, $payload->signature)) {
+
+            $this->logger->info('signature verification failed');
+            
             return new JsonResponse([
                 'data' => null,
                 'status' => 'fail', 
@@ -116,6 +143,8 @@ class DefaultController extends Controller
                 'error' => 'Can not get Installments'
             ]);
         }
+        
+        $this->logger->info('installment action return');
         
         return new JsonResponse([
             'data' => ['installments' => $installments],
