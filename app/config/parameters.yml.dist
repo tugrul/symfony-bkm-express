@@ -18,11 +18,10 @@ parameters:
     # A secret key that's used to generate certain security-related tokens
     secret: ThisTokenIsNotSoSecretChangeIt
 
-    bkm_express_merchant_id: ~ 
+    bkm_express_merchant_id: 219be6b7-b3ca-4bd1-9886-a16d40b0bfe2
     bkm_express_environment: preprod
     bkm_express_certificates: 
             remote:
                 public: '%kernel.root_dir%/Resources/keys/bkm/public.pem'
             local:
-                public: '%kernel.root_dir%/Resources/keys/vendor/public.pem'
-                private: '%kernel.root_dir%/Resources/keys/vendor/private.pem'
+                private: '%kernel.root_dir%/Resources/keys/bkm-test/private.pem'
