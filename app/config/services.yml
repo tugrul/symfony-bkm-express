@@ -38,6 +38,7 @@ services:
             - '%bkm_express_merchant_id%'
             - '%bkm_express_environment%'
             - '%bkm_express_certificates%'
+            - '%bkm_express_pos_accounts%'
 
     # add more services, or override services that need manual wiring
     # AppBundle\Service\ExampleService:

@@ -16,6 +16,17 @@ class Encryption
         $this->privateLocalKey = $privateLocalKey;
     }
 
+    protected function getPublicKey()
+    {
+        $publicKey = openssl_get_publickey('file://' . $this->publicRemoteKey);
+        
+        if ($publicKey === false) {
+            throw new EncryptionException('public key not opened');
+        }
+        
+        return $publicKey;
+    }
+    
     public function signData($data)
     {
         $privateKey = openssl_get_privatekey('file://' . $this->privateLocalKey);
@@ -37,11 +48,7 @@ class Encryption
 
     public function verifyData($data, $signature)
     {
-        $publicKey = openssl_get_publickey('file://' . $this->publicRemoteKey);
-        
-        if ($publicKey === false) {
-            throw new EncryptionException('public key not opened');
-        }
+        $publicKey = $this->getPublicKey();
         
         $result = openssl_verify($data, base64_decode($signature), $publicKey, "sha256WithRSAEncryption");
 
@@ -52,5 +59,32 @@ class Encryption
         }
 
         return $result === 1;
+    }
+    
+    public function encrypt($data, $chunklen = 245)
+    {   
+        $publicKey = $this->getPublicKey();
+        
+        $parts = [];
+        $count = ceil(strlen($data) / $chunklen);
+
+        try {
+        
+            for ($i = 0; $i < $count; $i++) {
+
+                $part = substr($data, $i * $chunklen, $chunklen);
+
+                if (openssl_public_encrypt($part, $encrypted, $publicKey)) {
+                    $parts[] = base64_encode($encrypted);
+                } else {
+                    throw new EncryptionException(openssl_error_string());
+                }
+            }
+
+        } finally {
+            openssl_free_key($publicKey);
+        }
+
+        return implode('|:*:|', $parts);
     }
 }

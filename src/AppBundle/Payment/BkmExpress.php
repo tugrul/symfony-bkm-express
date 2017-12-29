@@ -5,6 +5,8 @@ namespace AppBundle\Payment;
 
 use Psr\Log\LoggerInterface;
 
+use AppBundle\Payment\BkmExpress\PosAccount;
+
 class BkmExpress
 {
     protected static $environments = [
@@ -35,13 +37,18 @@ class BkmExpress
     protected $certificates;
     protected $encryption;
     protected $logger;
+    protected $posAccounts = [];
 
-    public function __construct(string $merchantId, string $environment, array $certificates, LoggerInterface $logger)
+    public function __construct(string $merchantId, string $environment, array $certificates, array $posAccounts, LoggerInterface $logger)
     {
         $this->merchantId = $merchantId;
         $this->environment = $environment;
         $this->certificates = $certificates;
         $this->logger = $logger;
+        
+        foreach ($posAccounts as $bankId => $config) {
+            $this->setPosAccount($bankId, $config);
+        }
         
         $this->encryption = new BkmExpress\Encryption($certificates['remote']['public'], 
                 $certificates['local']['private']);
@@ -80,6 +87,29 @@ class BkmExpress
         return $this;
     }
 
+    public function setPosAccount($bankId, array $config)
+    {
+        $posAccount = new PosAccount();
+        $posAccount->setBankIndicator($bankId);
+        $posAccount->setServiceUrl($config['service_url']);
+        $posAccount->setUserId($config['user_id'] ?? '');
+        $posAccount->setPassword($config['password'] ?? '');
+        $posAccount->setParams($config['params']);
+        
+        $this->posAccounts[sprintf('%04d', $bankId)] = $posAccount;
+    }
+    
+    public function getPosAccount($bankId, $encrypt = false)
+    {
+        $posAccount = $this->posAccounts[$bankId] ?? null;
+        
+        if ($encrypt) {
+            return $this->encryption->encrypt(json_encode($posAccount));
+        }
+
+        return $posAccount;
+    }
+    
     public function login()
     {
         $this->logger->info('login operation started');

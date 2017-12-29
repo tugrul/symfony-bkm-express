@@ -131,9 +131,9 @@ class DefaultController extends Controller
                 'numberOfInstallment' => 1,
                 'installmentAmount' => $installmentAmount,
                 'totalAmount' => $payload->totalAmount,
-                'vposConfig' => null
+                'vposConfig' => $this->bkmExpress->getPosAccount($bankCode, true)
             ];
-            
+
         }
         
         if (count($installments) === 0) {
