@@ -32,7 +32,7 @@ class DefaultController extends Controller
         
         $tutar = $request->query->get('tutar', 1);
 
-        $tutar = str_replace(',', '.');
+        $tutar = str_replace(',', '.', $tutar);
         $tutar = number_format($tutar, 2, ',', '');
 
         $payload = [
