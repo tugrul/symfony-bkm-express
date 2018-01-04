@@ -30,9 +30,13 @@ class DefaultController extends Controller
     {
         $this->logger->info('index action');
         
-        
+        $tutar = $request->query->get('tutar', 1);
+
+        $tutar = str_replace(',', '.');
+        $tutar = number_format($tutar, 2, ',', '');
+
         $payload = [
-            'amount' => '1',
+            'amount' =>  $tutar,
             'nonceUrl' => $this->generateUrl('bkm-nonce', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'installmentUrl' => $this->generateUrl('bkm-installment', [], UrlGeneratorInterface::ABSOLUTE_URL),
 //            'nonceUrl' => 'https://tugrul.info/bkm/nonce?XDEBUG_SESSION_START=tugrul',
