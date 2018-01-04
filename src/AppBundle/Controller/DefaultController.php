@@ -35,6 +35,8 @@ class DefaultController extends Controller
             'amount' => '1',
             'nonceUrl' => $this->generateUrl('bkm-nonce', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'installmentUrl' => $this->generateUrl('bkm-installment', [], UrlGeneratorInterface::ABSOLUTE_URL),
+//            'nonceUrl' => 'https://tugrul.info/bkm/nonce?XDEBUG_SESSION_START=tugrul',
+//            'installmentUrl' => 'https://tugrul.info/bkm/installment?XDEBUG_SESSION_START=tugrul',
             'orderId' => uniqid('eu_', true),
             //'address' => '',
             //'tckn' => '',

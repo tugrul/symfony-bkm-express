@@ -14,6 +14,8 @@ class PosAccount implements \JsonSerializable
     
     protected $params;
 
+    protected $preAuth = false;
+    
     public function getBankIndicator()
     {
         return $this->bankIndicator;
@@ -38,7 +40,7 @@ class PosAccount implements \JsonSerializable
     {
         return $this->params;
     }
-
+    
     public function setBankIndicator($bankIndicator)
     {
         $this->bankIndicator = $bankIndicator;
@@ -69,6 +71,17 @@ class PosAccount implements \JsonSerializable
         return $this;
     }
 
+    public function setPreAuth($preAuth)
+    {
+        $this->preAuth = $preAuth;
+        return $this;
+    }
+    
+    public function getPreAuth()
+    {
+        return $this->preAuth;
+    }
+    
     public function jsonSerialize()
     {
         return [
@@ -76,7 +89,8 @@ class PosAccount implements \JsonSerializable
             'vposPassword' => $this->password ?? '',
             'extra' => $this->params ?? [],
             'bankIndicator' => sprintf('%04d', $this->bankIndicator),
-            'serviceUrl' => $this->serviceUrl
+            'serviceUrl' => $this->serviceUrl,
+            'preAuth' => $this->preAuth
         ];
     }
 

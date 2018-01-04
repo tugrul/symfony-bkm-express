@@ -1,20 +1,20 @@
 parameters:
     bkm_express_pos_accounts:
-        0046:
+        '0046':
             service_url: http://srvirt01:7200/akbank
             user_id: akapi
             password: TEST1234
             params:
                 ClientId: 100111222
                 storekey: TEST1234
-        0032:
+        '0032':
             service_url: http://srvirt01:7200/teb
             user_id: bkmapi
             password: KUTU8520
             params:
                 ClientId: 401562930
                 storekey: KUTU8520
-        0015:
+        '0015':
             service_url: http://srvirt01:7200/vpos724v3/
             user_id: 000000000011429
             password: BKMexpress
@@ -23,7 +23,7 @@ parameters:
                 uyeno: 000000000011429
                 islemyeri: I
                 uyeref: 917250515
-        0203:
+        '0203':
             service_url: http://srvirt01:7200/VPServlet
             user_id: 600218
             password: 123qweASD
@@ -32,12 +32,12 @@ parameters:
                 terminalmerchantid: 7000679
                 storekey: 12345678
                 terminalid: 30690168
-        0208:
+        '0208':
             service_url: http://srvirt01:7200/iposnet/sposnet.aspx
             params:
                 MerchantId: 006100200140200
                 MerchantPassword: 12345678
-        0134:
+        '0134':
             service_url: http://srvirt01:7200/mpi/Default.aspx
             user_id: 1
             password: 12345
@@ -45,14 +45,14 @@ parameters:
                 ShopCode: 3123
                 UserCode: InterTestApi
                 storeKey: gDg1N
-        0111:
+        '0111':
             service_url: http://srvirt01:7200/finans
             user_id: bkmapi
             password: TEST1234
             params:
                 ClientId: 600000120
                 storekey: TEST1234
-        0062:
+        '0062':
             service_url: http://srvirt01:7200/VPServlet
             user_id: 600218
             password: 123qweASD
@@ -61,20 +61,20 @@ parameters:
                 terminalmerchantid: 7000679
                 storekey: 12345678
                 terminalid: 30690168
-        0012:
+        '0012':
             service_url: http://srvirt01:7200/halkbank
             user_id: testapi
             password: TEST1234
             params:
                 ClientId: 500020009
                 storekey: Ab123456
-        0123:
+        '0123':
             service_url: https://vpostest.advantage.com.tr/servlet/cc5ApiServer
             user_id: a
             password: Test1234
             params:
                 ClientId: 0004220
-        0099:
+        '0099':
             service_url: http://srvirt01:7200/VPServlet
             user_id: 600218
             password: 123qweASD
@@ -83,14 +83,14 @@ parameters:
                 terminalmerchantid: 7000679
                 storekey: 12345678
                 terminalid: 30690168
-        0064:
+        '0064':
             service_url: http://srvirt01:7200/isbank
             user_id: bkmapi
             password: KUTU8900
             params:
                 ClientId: 700655047520
                 storekey: TEST123456
-        0205:
+        '0205':
             service_url: https://boatest.kuveytturk.com.tr/boa.virtualpos.services/Home/ThreeDModelGate
             user_id: apiuser
             password: Api123
@@ -98,7 +98,7 @@ parameters:
                 MerchantId: 2
                 CustomerId: 8736633
                 orderId: 852507088
-        0146:
+        '0146':
             service_url: http://srvirt01:7200/VPServlet
             user_id: 600218
             password: 123qweASD
@@ -107,7 +107,7 @@ parameters:
                 terminalmerchantid: 7000679
                 storekey: 12345678
                 terminalid: 30690168
-        0059:
+        '0059':
             service_url: http://srvirt01:7200/VPServlet
             user_id: 600218
             password: 123qweASD
@@ -116,7 +116,7 @@ parameters:
                 terminalmerchantid: 7000679
                 storekey: 12345678
                 terminalid: 30690168
-        0206:
+        '0206':
             service_url: https://testserver1:15443/BKMExpressServices.asmx
             params:
                 orgNo: 006
@@ -124,7 +124,7 @@ parameters:
                 termNo: 955434
                 merchantKey: HngvXM22
                 orderId: 674451441
-        0010:
+        '0010':
             service_url: http://srvirt01:7200/ziraat
             user_id: bkmtest
             password: TEST1691
@@ -132,7 +132,7 @@ parameters:
                 ClientId: 190001691
                 storekey: TRPS1691
                 orderId: 9073194
-        0067:
+        '0067':
             service_url: http://srvirt01:7200/PosnetWebService/XML
             user_id: bkm3d1
             password: 12345
