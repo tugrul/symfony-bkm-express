@@ -128,17 +128,12 @@ class DefaultController extends Controller
             list($bin, $bankCode) = explode('@', $bin);
             
             
-            $installmentRate = 1;
-        
-            $installmentAmount = floatval(str_replace(',', '.', $payload->totalAmount)) * $installmentRate;
-            $installmentAmount = number_format($installmentAmount, 2, ',', '');
+            $posConfig = $this->bkmExpress->getPosAccount($bankCode, true);
 
-            $installments[$bin][] = [
-                'numberOfInstallment' => 1,
-                'installmentAmount' => $installmentAmount,
-                'totalAmount' => $payload->totalAmount,
-                'vposConfig' => $this->bkmExpress->getPosAccount($bankCode, true)
-            ];
+            $installments[$bin][] = $this->getInstallmentRow($payload->totalAmount, 1, 1, $posConfig);
+            $installments[$bin][] = $this->getInstallmentRow($payload->totalAmount, 3, 1.05, $posConfig);
+            $installments[$bin][] = $this->getInstallmentRow($payload->totalAmount, 6, 1.07, $posConfig);
+            $installments[$bin][] = $this->getInstallmentRow($payload->totalAmount, 9, 1.11, $posConfig);
 
         }
         
@@ -159,4 +154,16 @@ class DefaultController extends Controller
         ]);
     }
     
+    
+    protected function getInstallmentRow($amount, $count, $rate, $pos = null)
+    {
+        $amount = floatval(str_replace(',', '.', $amount)) * $rate;
+
+        return [
+            'numberOfInstallment' => $count,
+            'installmentAmount' => number_format($amount / $count, 2, ',', ''),
+            'totalAmount' => number_format($amount, 2, ',', ''),
+            'vposConfig' => $pos
+        ];
+    }
 }
