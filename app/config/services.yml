@@ -40,6 +40,10 @@ services:
             - '%bkm_express_certificates%'
             - '%bkm_express_pos_accounts%'
 
+    AppBundle\Payment\BkmExpress\SoapClient:
+        arguments:
+            - '%bkm_express_wsdl%'
+
     # add more services, or override services that need manual wiring
     # AppBundle\Service\ExampleService:
     #     arguments:

@@ -16,11 +16,16 @@ class DefaultController extends Controller
    
     protected $bkmExpress;
     protected $logger;
-    
-    public function __construct(BkmExpress $bkmExpress, LoggerInterface $logger)
+    protected $soapClient;
+
+
+    public function __construct(BkmExpress $bkmExpress, LoggerInterface $logger, BkmExpress\SoapClient $soapClient)
     {
         $this->bkmExpress = $bkmExpress;
         $this->logger = $logger;
+        $this->soapClient = $soapClient;
+        
+        $soapClient->setBkmExpress($bkmExpress);
     }
     
     /**
@@ -39,8 +44,6 @@ class DefaultController extends Controller
             'amount' =>  $tutar,
             'nonceUrl' => $this->generateUrl('bkm-nonce', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'installmentUrl' => $this->generateUrl('bkm-installment', [], UrlGeneratorInterface::ABSOLUTE_URL),
-//            'nonceUrl' => 'https://tugrul.info/bkm/nonce?XDEBUG_SESSION_START=tugrul',
-//            'installmentUrl' => 'https://tugrul.info/bkm/installment?XDEBUG_SESSION_START=tugrul',
             'orderId' => uniqid('eu_', true),
             //'address' => '',
             //'tckn' => '',
@@ -101,6 +104,60 @@ class DefaultController extends Controller
     /**
      * 
      * @param Request $request
+     * @Route("/verify", name="bkm-verify")
+     */
+    public function verifyAction(Request $request)
+    {
+        $payload = json_decode($request->getContent(), true);
+
+        return new JsonResponse($this->bkmExpress->getEncryption()->verifyData($payload['data'], $payload['signature']));
+    }
+    
+    /**
+     * 
+     * @param Request $request
+     * @Route("/refund", name="bkm-refund")
+     */
+    public function refundAction(Request $request)
+    {
+        $payload = json_decode($request->getContent(), true);
+
+        if (isset($payload['posId'])) {
+            $posConfig = $this->bkmExpress->getPosAccount($payload['posId']);
+
+            unset($payload['posId']);
+
+            if (!empty($posConfig)) {
+                $payload['posUid'] = $posConfig->getUserId();
+                $payload['posPwd'] = $posConfig->getPassword();
+                $payload['extra'] = $posConfig->getParams();
+            }
+        }
+        
+        $response = $this->soapClient->reversalWithRef(array_merge($payload, [
+            'merchantId' => $this->bkmExpress->getMerchantId(),
+            'uniqueReferans' => uniqid('eu_', true),
+            'requestType' => 2,
+        ]));
+        
+        
+        $xml = new \SimpleXMLElement('<response/>');
+        //array_walk_recursive($response, array($xml, 'addChild'));
+        
+        foreach ($response as $key => $value) {
+            $xml->addChild($key, $value);
+        }
+        
+        $response = new Response($xml->asXML());
+        
+        $response->headers->set('Content-Type', 'application/xml');
+        
+        return $response;
+    }
+    
+    /**
+     * 
+     * @param Request $request
      * @Route("/installment", name="bkm-installment")
      */
     public function installmentAction(Request $request)
@@ -129,6 +186,7 @@ class DefaultController extends Controller
             
             
             $posConfig = $this->bkmExpress->getPosAccount($bankCode, true);
+            // $posConfig = null;
 
             $installments[$bin][] = $this->getInstallmentRow($payload->totalAmount, 1, 1, $posConfig);
             $installments[$bin][] = $this->getInstallmentRow($payload->totalAmount, 3, 1.05, $posConfig);
